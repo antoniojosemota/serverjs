@@ -33,7 +33,29 @@ app.get('/dados', async (req, res) => {
     res.status(500).send('Erro ao enviar dados para o Firebase.');
   }
 });
+app.get('/update', async (req, res) => {
+  const { direction, buttonState, sensor } = req.query;
 
+  if (!direction || !buttonState || !sensor) {
+    return res.status(400).send('Erro: Temperatura e umidade são obrigatórias.');
+  }
+
+  console.log(`Recebido (via /update): Direção = ${direction}, Botão = ${buttonState} e Sensor = ${sensor}`);
+
+  try {
+    await axios.post(`${FIREBASE_URL}/leituras.json`, {
+      direcao: direction,
+      botao: buttonState,
+      sensor: sensor,
+      timestamp: new Date().toISOString()
+    });
+
+    res.send('Dados recebidos (via /update) e enviados ao Firebase com sucesso!');
+  } catch (error) {
+    console.error('Erro ao enviar para o Firebase:', error.message);
+    res.status(500).send('Erro ao enviar dados para o Firebase.');
+  }
+});
 // Porta padrão (Railway usa variável de ambiente PORT)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
