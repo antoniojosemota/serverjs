@@ -8,34 +8,25 @@ app.use(express.json());
 // URL do seu Realtime Database Firebase (modifique aqui)
 const FIREBASE_URL = 'https://pico-bussola-default-rtdb.firebaseio.com/';
 
+function codificarDirecao(direcao) {
+  const mapa = {
+    "NORTE": 0,
+    "NORDESTE": 1,
+    "LESTE": 2,
+    "SUDESTE": 3,
+    "SUL": 4,
+    "SUDOESTE": 5,
+    "OESTE": 6,
+    "NOROESTE": 7,
+    "CENTRO": 8
+  };
+  return mapa[direcao.toUpperCase()] ?? -1; // Retorna -1 se direção for inválida
+}
+
 // Rota que recebe os dados do Pico W
-app.get('/dados', async (req, res) => {
-  const { direction, buttonState, sensor } = req.query;
-
-  if (!direction || !buttonState || !sensor) {
-    return res.status(400).send('Erro: Temperatura e umidade são obrigatórias.');
-  }
-
-  console.log(`Recebido: Direção = ${direction}, Botão = ${buttonState} e Sensor = ${sensor}`);
-
-  try {
-    // Envia para o Firebase
-    await axios.post(`${FIREBASE_URL}/leituras.json`, {
-      direcao: direction,
-      botao: buttonState,
-      sensor: sensor,
-      timestamp: new Date().toISOString()
-    });
-
-    res.send('Dados recebidos e enviados ao Firebase com sucesso!');
-  } catch (error) {
-    console.error('Erro ao enviar para o Firebase:', error.message);
-    res.status(500).send('Erro ao enviar dados para o Firebase.');
-  }
-});
 app.get('/update', async (req, res) => {
   const { direction, buttonState, sensor } = req.query;
-
+  const direcaoCodigo = codificarDirecao(direction);
   if (!direction || !buttonState || !sensor) {
     return res.status(400).send('Erro: Temperatura e umidade são obrigatórias.');
   }
@@ -45,6 +36,7 @@ app.get('/update', async (req, res) => {
   try {
     await axios.post(`${FIREBASE_URL}/leituras.json`, {
       direcao: direction,
+      direcao_code: direcaoCodigo,
       botao: buttonState,
       sensor: sensor,
       timestamp: new Date().toISOString()
