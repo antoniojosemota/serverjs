@@ -10,15 +10,15 @@ const FIREBASE_URL = 'https://pico-bussola-default-rtdb.firebaseio.com/';
 
 function codificarDirecao(direcao) {
   const mapa = {
-    "NORTE": 1,
-    "NORDESTE": 2,
-    "LESTE": 3,
-    "SUDESTE": 4,
-    "SUL": 5,
-    "SUDOESTE": 6,
-    "OESTE": 7,
-    "NOROESTE": 8,
-    "CENTRO": 9
+     "NORTE": 0,
+    "NORDESTE": 45,
+    "LESTE": 90,
+    "SUDESTE": 135,
+    "SUL": 180,
+    "SUDOESTE": 225,
+    "OESTE": 270,
+    "NOROESTE": 315,
+    "CENTRO": 0
   };
   return mapa[direcao.toUpperCase()] ?? -1; // Retorna -1 se direção for inválida
 }
